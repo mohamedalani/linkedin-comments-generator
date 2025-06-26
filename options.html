@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LinkedIn AI Commentator Settings</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .container {
+      width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 24px;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #0077b5;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #005582;
+    }
+    #status {
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Settings</h1>
+    <h2>Claude API Key</h2>
+    <p>Enter your Claude API key below. This is stored securely using Chrome's storage API and is required to generate comments using Claude Opus 4.</p>
+    <input type="password" id="apiKey" placeholder="Enter your Claude API key here (e.g., sk-ant-...)">
+    <button id="save">Save Key</button>
+    <p id="status"></p>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html> 
