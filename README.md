@@ -1,11 +1,12 @@
 # LinkedIn AI Comment Generator
 
-This is a Chrome extension that uses Claude Opus 4 to generate intelligent comments for LinkedIn posts.
+This is a Chrome extension that uses Claude Sonnet 4 to generate intelligent comments for LinkedIn posts.
 
 ## Features
 - Injects a "✨ Gen AI" button into the action bar of LinkedIn posts.
-- Clicking the button generates a relevant comment using the Claude Opus 4 API.
+- Clicking the button generates a relevant comment using the Claude Sonnet 4 API.
 - Automatically fills the comment box with the generated text.
+- **Automatically likes the post after you submit your comment**.
 - Securely stores your Claude API key in Chrome's local storage.
 
 ## Project Structure
@@ -15,6 +16,7 @@ This is a Chrome extension that uses Claude Opus 4 to generate intelligent comme
 - `content.js`: The script injected into LinkedIn pages to add the button and handle DOM manipulation.
 - `popup.html` / `popup.js`: The UI and logic for the extension's popup.
 - `options.html` / `options.js`: The settings page where the user enters their Claude API key.
+- `prompt.txt`: The AI prompt template used for generating comments.
 - `images/`: Directory for the extension's icons.
 
 ## Setup
@@ -36,4 +38,13 @@ This is a Chrome extension that uses Claude Opus 4 to generate intelligent comme
 3.  Click the ✨ **Gen AI** button located in the post's action bar (next to Like, Comment, etc.).
 4.  Wait for Claude to generate a comment.
 5.  The comment box will be automatically filled with the generated text.
-6.  Review and edit the comment as you see fit, then post it manually. 
+6.  Review and edit the comment as you see fit, then post it manually.
+7.  **The post will be automatically liked after you submit your comment**.
+
+## New Auto-Like Feature
+
+The extension now automatically likes posts after you successfully submit a comment. This feature:
+- Only likes posts that haven't been liked yet
+- Waits for comment submission before liking
+- Works with the comment validation workflow
+- Enhances engagement by combining commenting and liking actions 

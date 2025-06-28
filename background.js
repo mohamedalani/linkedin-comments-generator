@@ -27,6 +27,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Return true to indicate that the response will be sent asynchronously
     return true;
   }
+
+  if (request.action === "generateReply") {
+    // 1. Get API Key from storage
+    chrome.storage.sync.get(['claude_api_key'], (result) => {
+      const apiKey = result.claude_api_key;
+      if (!apiKey) {
+        sendResponse({ success: false, message: "API Key not found. Please set it in the options page." });
+        return;
+      }
+
+      // 2. Call Claude API for reply generation
+      callClaudeAPIForReply(apiKey, request.postContent, request.commentContent)
+        .then(reply => {
+          sendResponse({ success: true, comment: reply });
+        })
+        .catch(error => {
+          sendResponse({ success: false, message: error.message });
+        });
+    });
+
+    // Return true to indicate that the response will be sent asynchronously
+    return true;
+  }
 });
 
 /**
@@ -57,6 +80,30 @@ Comment:`;
 }
 
 /**
+ * Loads the reply prompt template from the prompt-reply.txt file
+ * @returns {Promise<string>} The reply prompt template content
+ */
+async function loadReplyPromptTemplate() {
+  try {
+    const response = await fetch(chrome.runtime.getURL('prompt-reply.txt'));
+    const promptTemplate = await response.text();
+    return promptTemplate;
+  } catch (error) {
+    console.error('Failed to load reply prompt template:', error);
+    // Fallback prompt if file can't be loaded
+    return `Tu es Mo, expert en IA générative. Réponds au commentaire de manière courte et naturelle.
+
+Post original:
+"\${postContent}"
+
+Commentaire auquel répondre:
+"\${commentContent}"
+
+Réponse:`;
+  }
+}
+
+/**
  * Calls the Claude Sonnet 4 API to generate a comment based on the post content
  * @param {string} apiKey - The Claude API key
  * @param {string} postContent - The LinkedIn post content to generate a comment for
@@ -78,6 +125,49 @@ async function callClaudeAPI(apiKey, postContent) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 150,
+      temperature: 1.5,
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0].text.trim();
+}
+
+/**
+ * Calls the Claude Sonnet 4 API to generate a reply to a comment
+ * @param {string} apiKey - The Claude API key
+ * @param {string} postContent - The original LinkedIn post content
+ * @param {string} commentContent - The comment content to reply to
+ * @returns {Promise<string>} The generated reply
+ */
+async function callClaudeAPIForReply(apiKey, postContent, commentContent) {
+  const promptTemplate = await loadReplyPromptTemplate();
+  const prompt = promptTemplate
+    .replace('${postContent}', postContent)
+    .replace('${commentContent}', commentContent);
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 100, // Shorter for replies
       temperature: 1,
       messages: [
         {
