@@ -125,7 +125,7 @@ async function callClaudeAPI(apiKey, postContent) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 150,
-      temperature: 1.5,
+      temperature: 1,
       messages: [
         {
           role: "user",
